@@ -20,6 +20,7 @@ parser.addArgument('--db', { defaultValue: null });
 parser.addArgument('--knexfile', { defaultValue: null });
 const args = parser.parseArgs();
 
+const NODE_ENV = process.env.NODE_ENV || 'development';
 let config;
 
 if (args.db) {
@@ -36,6 +37,10 @@ if (args.db) {
 	config = require(process.cwd() + '/knexfile.js');
 }
 let knexDump = (function() {
+	// retrieve env specific configuration if available 
+	if (config[NODE_ENV]) {
+		config = config[NODE_ENV];
+	}
 	switch (config.client) {
 		case 'sqlite3':
 			return new SQLite3Dump(config);
